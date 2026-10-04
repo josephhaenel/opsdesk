@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { BookOpen, ExternalLink, ShieldCheck, X } from 'lucide-react';
+import { BookOpen, ShieldCheck, X } from 'lucide-react';
 import type { Evidence } from './types';
 import { displayDate } from './api';
 
@@ -18,7 +18,11 @@ export function EvidenceDialog({ evidence, loading, error, onClose }: Props) {
     return () => dialog?.close();
   }, []);
 
-  return <dialog ref={dialogRef} className="evidence-dialog" aria-labelledby="evidence-title" onCancel={onClose} onClick={(event) => { if (event.target === event.currentTarget) onClose(); }}>
+  return <dialog ref={dialogRef} className="evidence-dialog" aria-labelledby="evidence-title" onCancel={onClose} onClick={(event) => {
+    if (event.target !== event.currentTarget) return;
+    const bounds = event.currentTarget.getBoundingClientRect();
+    if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) onClose();
+  }}>
     <div className="dialog-heading">
       <span className="eyebrow"><BookOpen size={15} /> POLICY SOURCE</span>
       <button className="icon-button" type="button" onClick={onClose} aria-label="Close evidence"><X size={20} /></button>
@@ -30,7 +34,7 @@ export function EvidenceDialog({ evidence, loading, error, onClose }: Props) {
       </div>
       <blockquote className="source-text">{evidence.text}</blockquote>
       <div className="source-footer"><ShieldCheck size={17} /><span>{evidence.audience === 'manager' ? 'Manager policy' : 'Employee policy'} · Access verified by the server</span></div>
-      <p className="small muted source-id"><ExternalLink size={13} /> Source ID <code>{evidence.id}</code></p>
+      <p className="small muted source-id">Source ID <code>{evidence.id}</code></p>
     </> : null}
   </dialog>;
 }
