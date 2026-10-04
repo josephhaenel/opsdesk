@@ -145,11 +145,15 @@ export function ReviewPanel({
 }: ReviewProps) {
   const completed = workflow.state === 'completed';
   const locked = completed || busy !== null || unresolvedApproval;
-  const inputBusy = busy !== null || unresolvedApproval;
   const missingContact = !fields.contact_name.trim() || !fields.callback.trim();
   const forbiddenPriority = fields.priority === 'urgent' && role !== 'manager';
   const blocked =
     changed || missingContact || forbiddenPriority || !workflow.can_approve || !confirmed;
+  const referenceMarker = '\n\nSupporting policy references:';
+  const referenceIndex = fields.response.indexOf(referenceMarker);
+  const reply = referenceIndex < 0 ? fields.response : fields.response.slice(0, referenceIndex);
+  const references =
+    referenceIndex < 0 ? '' : fields.response.slice(referenceIndex + referenceMarker.length).trim();
   function update<K extends keyof DraftFields>(key: K, value: DraftFields[K]) {
     onChange({ ...fields, [key]: value });
   }
@@ -160,167 +164,194 @@ export function ReviewPanel({
       aria-labelledby="review-panel-title"
     >
       <div className="section-heading">
-        <h2 id="review-panel-title">{completed ? 'Approved revision' : 'Review the proposal'}</h2>
-        <span className="badge neutral">Revision {workflow.revision.number}</span>
+        <h2 id="review-panel-title">{completed ? 'What you approved' : 'Suggested reply'}</h2>
+        <span className="badge neutral">
+          {changed ? 'Unsaved changes' : `Saved revision ${workflow.revision.number}`}
+        </span>
       </div>
-      <form
-        onSubmit={(event) => {
-          event.preventDefault();
-          if (!locked && changed) onSave();
-        }}
-      >
-        <label className="field-label" htmlFor="draft-response">
-          Customer response <span className="label-note">Draft only; never sent</span>
-        </label>
-        <textarea
-          id="draft-response"
-          rows={6}
-          value={fields.response}
-          onChange={(event) => update('response', event.target.value)}
-          disabled={inputBusy}
-          readOnly={completed}
-          maxLength={8000}
-          className="response-textarea"
-        />
-        <div className="action-divider">
-          <span>PROPOSED ACTION</span>
-          <span>Create a simulated support case</span>
-        </div>
-        <label className="field-label" htmlFor="case-summary">
-          Case summary
-        </label>
-        <textarea
-          id="case-summary"
-          rows={3}
-          value={fields.summary}
-          onChange={(event) => update('summary', event.target.value)}
-          disabled={inputBusy}
-          readOnly={completed}
-          maxLength={1200}
-        />
-        <div className="contact-fields">
+      <div className="review-preview">
+        <p className="reply-preview">{reply}</p>
+        <p className="small muted">Draft only. This reply will not be sent.</p>
+        {references ? (
+          <details className="response-references">
+            <summary>Policy reference IDs</summary>
+            <p>{references}</p>
+          </details>
+        ) : null}
+      </div>
+      <div className="case-preview">
+        <h3>{completed ? 'Saved case details' : 'The case you would create'}</h3>
+        <p>{fields.summary}</p>
+        <dl className="case-preview-details">
           <div>
-            <label className="field-label" htmlFor="contact-name">
-              Contact name <span aria-hidden="true">*</span>
-            </label>
-            <input
-              id="contact-name"
-              value={fields.contact_name}
-              onChange={(event) => update('contact_name', event.target.value)}
-              disabled={inputBusy}
-              readOnly={completed}
-              maxLength={120}
-              aria-required="true"
-              aria-describedby={
-                workflow.missing_fields.length && !completed ? 'required-information' : undefined
-              }
-            />
+            <dt>Contact</dt>
+            <dd>{fields.contact_name || 'Name needed'}</dd>
           </div>
           <div>
-            <label className="field-label" htmlFor="callback">
-              Phone or email <span aria-hidden="true">*</span>
-            </label>
-            <input
-              id="callback"
-              type="text"
-              value={fields.callback}
-              onChange={(event) => update('callback', event.target.value)}
-              disabled={inputBusy}
-              readOnly={completed}
-              maxLength={200}
-              aria-required="true"
-              aria-describedby={
-                workflow.missing_fields.length && !completed ? 'required-information' : undefined
-              }
-            />
+            <dt>Phone or email</dt>
+            <dd>{fields.callback || 'Contact details needed'}</dd>
           </div>
-        </div>
-        <div className="priority-row">
           <div>
-            <label className="field-label" htmlFor="priority">
-              Priority
-            </label>
-            <select
-              id="priority"
-              value={fields.priority}
-              onChange={(event) =>
-                update('priority', event.target.value as DraftFields['priority'])
-              }
-              disabled={locked}
+            <dt>Priority</dt>
+            <dd>{fields.priority === 'urgent' ? 'Urgent escalation' : 'Standard investigation'}</dd>
+          </div>
+        </dl>
+      </div>
+      {!completed ? (
+        <>
+          <details className="edit-disclosure" open={missingContact || changed ? true : undefined}>
+            <summary>
+              {missingContact
+                ? 'Add the missing contact details'
+                : 'Edit the reply or case details'}
+            </summary>
+            <form
+              className="review-editor"
+              onSubmit={(event) => {
+                event.preventDefault();
+                if (!locked && changed) onSave();
+              }}
             >
-              <option value="standard">Standard investigation</option>
-              <option value="urgent" disabled={role !== 'manager'}>
-                Urgent escalation
-              </option>
-            </select>
-          </div>
-          {role !== 'manager' ? (
-            <p>
-              <LockKeyhole size={15} /> Managers can use urgent priority.
-            </p>
-          ) : null}
-        </div>
-        {!completed ? (
-          <>
-            {workflow.missing_fields.length ? (
-              <div className="missing-note" id="required-information">
-                <span className="status-dot amber" />
-                <span>
-                  Add{' '}
-                  {workflow.missing_fields
-                    .map((field) =>
-                      field === 'callback'
-                        ? 'a phone number or email'
-                        : field === 'contact_name'
-                          ? 'a contact name'
-                          : field.replaceAll('_', ' '),
-                    )
-                    .join(' and ')}
-                  , then save a revision to continue.
-                </span>
+              <label className="field-label" htmlFor="draft-response">
+                Customer reply
+              </label>
+              <textarea
+                id="draft-response"
+                rows={5}
+                value={fields.response}
+                onChange={(event) => update('response', event.target.value)}
+                disabled={locked}
+                maxLength={8000}
+                className="response-textarea"
+              />
+              <label className="field-label" htmlFor="case-summary">
+                Case summary
+              </label>
+              <textarea
+                id="case-summary"
+                rows={3}
+                value={fields.summary}
+                onChange={(event) => update('summary', event.target.value)}
+                disabled={locked}
+                maxLength={1200}
+              />
+              <div className="contact-fields">
+                <div>
+                  <label className="field-label" htmlFor="contact-name">
+                    Contact name <span aria-hidden="true">*</span>
+                  </label>
+                  <input
+                    id="contact-name"
+                    value={fields.contact_name}
+                    onChange={(event) => update('contact_name', event.target.value)}
+                    disabled={locked}
+                    maxLength={120}
+                    aria-required="true"
+                    aria-describedby={
+                      workflow.missing_fields.length ? 'required-information' : undefined
+                    }
+                  />
+                </div>
+                <div>
+                  <label className="field-label" htmlFor="callback">
+                    Phone or email <span aria-hidden="true">*</span>
+                  </label>
+                  <input
+                    id="callback"
+                    type="text"
+                    value={fields.callback}
+                    onChange={(event) => update('callback', event.target.value)}
+                    disabled={locked}
+                    maxLength={200}
+                    aria-required="true"
+                    aria-describedby={
+                      workflow.missing_fields.length ? 'required-information' : undefined
+                    }
+                  />
+                </div>
               </div>
-            ) : null}
+              <fieldset className="priority-choices">
+                <legend>Case priority</legend>
+                <label className="priority-choice">
+                  <input
+                    type="radio"
+                    name="priority"
+                    value="standard"
+                    checked={fields.priority === 'standard'}
+                    onChange={() => update('priority', 'standard')}
+                    disabled={locked}
+                  />
+                  <span>Standard investigation</span>
+                </label>
+                <label className="priority-choice">
+                  <input
+                    type="radio"
+                    name="priority"
+                    value="urgent"
+                    checked={fields.priority === 'urgent'}
+                    onChange={() => update('priority', 'urgent')}
+                    disabled={locked || role !== 'manager'}
+                    aria-describedby={role !== 'manager' ? 'priority-permission' : undefined}
+                  />
+                  <span>Urgent escalation</span>
+                </label>
+              </fieldset>
+              {role !== 'manager' ? (
+                <p className="small muted" id="priority-permission">
+                  <LockKeyhole size={14} /> Urgent escalation requires manager access.
+                </p>
+              ) : null}
+              {workflow.missing_fields.length ? (
+                <p className="missing-note" id="required-information">
+                  {missingContact
+                    ? 'Add a contact name and a phone number or email before creating this case.'
+                    : 'Contact details added. Save changes to make this case ready for review.'}
+                </p>
+              ) : null}
+              {changed || busy === 'save' ? (
+                <div className="save-row">
+                  <span className="small muted">Save these changes before approving.</span>
+                  <button
+                    type="submit"
+                    className="button secondary compact"
+                    disabled={
+                      !changed || locked || !fields.response.trim() || !fields.summary.trim()
+                    }
+                  >
+                    {busy === 'save' ? (
+                      <LoaderCircle size={15} className="spinner" />
+                    ) : (
+                      <Save size={15} />
+                    )}
+                    {busy === 'save' ? 'Saving…' : 'Save changes'}
+                  </button>
+                </div>
+              ) : null}
+            </form>
+          </details>
+          <div className="confirmation-block">
             {forbiddenPriority ? (
               <p className="inline-error">
-                Switch to the manager role to approve this urgent proposal, or save standard
-                priority.
+                This urgent case requires manager access. Switch access or save standard priority.
               </p>
             ) : null}
             {!workflow.can_approve && !workflow.missing_fields.length && !forbiddenPriority ? (
-              <div className="missing-note">
-                <span className="status-dot amber" />
-                <span>
-                  {workflow.order.delivery_status === 'delivered'
-                    ? 'This order is recorded as delivered. A missing-delivery case is not permitted for this record.'
-                    : 'This saved proposal is not currently eligible for approval under the available record and policies.'}
-                </span>
-              </div>
+              <p className="missing-note">
+                {workflow.order.delivery_status === 'delivered'
+                  ? 'The record says this order was delivered. A missing-delivery case cannot be created for this record.'
+                  : 'The saved record and policies do not currently permit this case.'}
+              </p>
             ) : null}
-            <div className="save-row">
-              <span className="small muted">
-                {changed ? 'Save your changes before approval' : 'All changes saved'}
-              </span>
-              <button
-                type="submit"
-                className="button secondary compact"
-                disabled={!changed || locked || !fields.response.trim() || !fields.summary.trim()}
-              >
-                {busy === 'save' ? (
-                  <LoaderCircle size={15} className="spinner" />
-                ) : (
-                  <Save size={15} />
-                )}
-                {busy === 'save' ? 'Saving…' : 'Save revision'}
-              </button>
-            </div>
+            {changed ? (
+              <p className="inline-error" role="status">
+                Save your changes to review the updated version.
+              </p>
+            ) : null}
             {unresolvedApproval ? (
-              <div className="missing-note">
-                <span className="status-dot amber" />
-                <span>
-                  The approval result is unknown. Retry the same operation to recover it before
-                  editing.
-                </span>
-              </div>
+              <p className="missing-note">
+                The result has not arrived. Recover the existing approval before editing or trying
+                another action.
+              </p>
             ) : (
               <label className={`approval-check ${changed ? 'disabled' : ''}`}>
                 <input
@@ -336,8 +367,8 @@ export function ReviewPanel({
                   }
                 />
                 <span>
-                  I reviewed revision {workflow.revision.number} and approve creating this simulated
-                  case.
+                  I reviewed the reply and case details in saved revision {workflow.revision.number}{' '}
+                  and approve creating this demo case.
                 </span>
               </label>
             )}
@@ -357,20 +388,21 @@ export function ReviewPanel({
               {busy === 'approve'
                 ? 'Creating case…'
                 : unresolvedApproval
-                  ? 'Recover approval result'
-                  : 'Approve & create simulated case'}
+                  ? 'Recover existing case'
+                  : 'Create demo case'}
               {busy === null ? <ArrowRight size={17} /> : null}
             </button>
             <p className="approval-footnote">
-              Creates a simulated case. No customer message is sent.
+              Creates one simulated support case. No customer message is sent.
             </p>
-          </>
-        ) : (
-          <div className="completed-note">
-            <CheckCircle2 size={17} /> This revision is preserved with the completed case.
           </div>
-        )}
-      </form>
+        </>
+      ) : (
+        <div className="completed-note">
+          <CheckCircle2 size={17} /> Saved revision {workflow.revision.number} is preserved with
+          this case.
+        </div>
+      )}
     </section>
   );
 }
