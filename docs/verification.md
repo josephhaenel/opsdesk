@@ -56,6 +56,10 @@ A local Chrome walkthrough verified AD-1042 through source-dialog opening, editi
 
 The public demo was deployed to the existing VM at [opsdesk.josephhaenel.com](https://opsdesk.josephhaenel.com) over HTTPS. The live Chrome walkthrough opened sources, edited and saved revision 2, then approved it and produced simulated case `SIM-C45737CD2D814B89`. Refresh recovered that same case ID. Reference mode remained visible, there was no horizontal overflow, and no JavaScript errors were observed. The public health endpoint returned HTTP 200 with PostgreSQL and reference generation mode. TLS, HSTS, and Content Security Policy were checked. These observations verify a public reference-mode happy path and the stated response/security properties; they are not load, outage, or live-model evaluation results.
 
+## Maroon theme verification
+
+The maroon-theme update at commit `c9a274024be50ecc7bb3374a28eb951ae6bdf33a` passed the local frontend build and [GitHub Actions](https://github.com/josephhaenel/opsdesk/actions/runs/37178590101). Only the web container was rebuilt and recreated. Public Chrome checks confirmed the served maroon button (`#8a2946`), near-white button text (`#fff4f7`), neutral graphite background (`#121214`), and updated browser theme color, with no injected preview styles. Desktop and 390-pixel mobile views had no horizontal overflow or JavaScript errors. Primary-button text contrast is 7.86:1 and hover contrast is 5.99:1. The public API health check and existing portfolio, banking, Caldera, Cadence, and SnowPro endpoints returned HTTP 200 afterward. This styling change introduced no workflow or API changes.
+
 ## Evaluation and remaining verification
 
 `eval/reference-scenarios.jsonl` contains **eight distinct scenario inputs**, all explicitly marked `scenario_only_not_model_evaluated`. They cover missing delivery, incomplete contact, restricted accounts, manager escalation, authority-changing prompt attempts, unknown facts, source instructions, and draft-only customer responses. Their structure and unique IDs were checked; no model answers or semantic scores were measured.
