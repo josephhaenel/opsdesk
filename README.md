@@ -57,7 +57,7 @@ See [local setup and hosting](docs/setup.md) for the complete application, separ
 
 The [verification report](docs/verification.md) records actual API/PostgreSQL runs, browser walkthroughs, and deployment checks. Eight initial [evaluation inputs](eval/reference-scenarios.jsonl) are included, explicitly marked as not model evaluated. No accuracy, cost savings, or business-impact numbers are claimed.
 
-CI runs PostgreSQL/API checks and the frontend build without provider credentials. A passing source build does not substitute for the browser workflow or semantic evaluations.
+CI checks Python/frontend formatting, runs PostgreSQL/API checks, and builds the frontend without provider credentials. A passing source build does not substitute for the browser workflow or semantic evaluations.
 
 ## Guided engineering
 
@@ -72,6 +72,6 @@ The project draws on applied distribution/enterprise AI experience using entirel
 1. Add one structured model adapter and a durable generation worker with leases, bounded retries, fencing, and restart checks.
 2. Measure lexical versus exact-vector/hybrid retrieval and validate grounded generation, abstention, and prompt-injection behavior.
 3. Complete the asynchronous approval lifecycle, broaden fault injection, and expand toward the planned 72 evaluation scenarios.
-4. Publish model/version, methodology, measured failures, and reproducible results; then produce a walkthrough video and personal-website case study.
+4. Publish model/version, methodology, measured failures, and reproducible results; then produce a walkthrough video and expand the personal-website project entry into a case study.
 
 The public repository and hosted reference workflow are useful early evidence. Applications can proceed while the remaining AI and learning increments are developed.
