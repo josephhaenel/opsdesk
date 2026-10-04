@@ -85,7 +85,9 @@ export default function App() {
     setConfirmed(false);
     saveLocal('selected', value.id);
     setWorkflows((current) => [value, ...current.filter((item) => item.id !== value.id)]);
-    if (value.state === 'completed') rememberApproval(null);
+    if (value.state === 'completed' && pendingApproval?.workflow_id === value.id) {
+      rememberApproval(null);
+    }
   }
 
   useEffect(() => {
@@ -105,8 +107,8 @@ export default function App() {
         request<{ orders: Order[] }>('/orders'),
         request<{ workflows: Workflow[] }>('/workflows'),
       ]);
-      const selectedId =
-        readSaved<string>('selected') ?? readSaved<PendingApproval>('approval')?.workflow_id;
+      const savedApproval = readSaved<PendingApproval>('approval');
+      const selectedId = savedApproval?.workflow_id ?? readSaved<string>('selected');
       let restored: Workflow | null = null;
       if (selectedId && workflowData.workflows.some((item) => item.id === selectedId))
         restored = await request<Workflow>(`/workflows/${encodeURIComponent(selectedId)}`);
@@ -117,7 +119,9 @@ export default function App() {
       if (restored) {
         setWorkflow(restored);
         setFields(draftFields(restored.revision));
-        if (restored.state === 'completed') rememberApproval(null);
+        if (restored.state === 'completed' && savedApproval?.workflow_id === restored.id) {
+          rememberApproval(null);
+        }
       } else {
         setWorkflow(null);
         saveLocal('selected', null);
@@ -197,7 +201,7 @@ export default function App() {
         setOrders(orderData.orders);
         setWorkflows(workflowData.workflows);
         const current = workflowData.workflows.find(
-          (item) => item.id === (workflow?.id ?? pendingApproval?.workflow_id),
+          (item) => item.id === (pendingApproval?.workflow_id ?? workflow?.id),
         );
         if (current) adoptWorkflow(current);
         else {
