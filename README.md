@@ -6,19 +6,21 @@ OpsDesk is a delivery-support portfolio application for Alder Distribution, a fi
 
 **[Live demo](https://opsdesk.josephhaenel.com)** · **[Source](https://github.com/josephhaenel/opsdesk)**
 
-Hosting uses an isolated application and database on the project owner's existing VM. The verified HTTPS workflow includes evidence review, saving revision 2, approval, and refresh recovery of the same case. See the verification report for the measured checks.
+Hosting uses an isolated application and database on the project owner's existing VM. The verification report records the API, browser, and deployment checks and their limits.
 
 ## Try the workflow
 
-1. Start with the employee demo identity and order AD-1042.
-2. Investigate the report and open its source policies.
-3. Edit the case summary or draft response, then save a new immutable revision.
-4. Review the displayed revision and approve the simulated case.
+1. Choose **Missing delivery**, the recommended scenario for AD-1042.
+2. Select **Prepare a support case** to collect the record, supporting policies, and draft.
+3. Review the suggested reply and proposed case. Open supporting evidence or edit the details when needed; save any edits before continuing.
+4. Confirm that you reviewed the saved version, then select **Create demo case**.
 5. Refresh to recover the same saved result and activity trail.
 
-AD-1043 demonstrates missing callback information. The manager identity can access AD-2041, escalation policies, and urgent priority. There are eight synthetic orders across three fictional customers and six versioned policies. Role identities are intentionally selectable; they demonstrate backend authorization rather than authenticating real employees. Mutable records are isolated per visitor and expire after 24 hours.
+Choose **Missing contact details** for AD-1043 to see why approval is blocked until a callback is added and saved. Report editing, alternative orders, supporting records, activity, and technical details are available in expandable sections.
 
-![OpsDesk workspace](docs/images/opsdesk.png)
+Under **Explore permissions & saved cases**, the manager identity can access AD-2041, escalation policies, and urgent priority. There are eight synthetic orders across three fictional customers and six versioned policies. Role identities are intentionally selectable; they demonstrate backend authorization rather than authenticating real employees. Mutable records are isolated per visitor and expire after 24 hours.
+
+![OpsDesk guided demo](docs/images/opsdesk.jpg)
 
 ## What is implemented
 

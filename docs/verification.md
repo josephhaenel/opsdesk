@@ -72,6 +72,22 @@ The API/web source release rebuilt only those OpsDesk services. The database con
 
 A follow-up screenshot exposed pale native-menu text on a light menu background. Commit `7fbac1a1d31ef03a7e68fb8068f2aaacceb7feed` sets explicit option foreground/background colors, including a readable disabled-option color. [GitHub Actions run 37182140199](https://github.com/josephhaenel/opsdesk/actions/runs/37182140199) passed formatting, build, and all 28 API checks in 2.50 seconds. Only web was rebuilt and recreated. The live open dropdown was visually inspected; both Employee and Manager remained enabled and could be selected. Its options used `#efedf0` text on `#1b1b1e`, with no horizontal overflow.
 
+## Guided demo verification
+
+Recorded October 4, 2026. Commit `74a08ca2bde4dd6bd2582a70e3eac240f7e8d3e8` replaces the dense initial workspace with a guided **choose scenario → review draft → create demo case** flow. The first screen offers **Missing delivery** and **Missing contact details**. Report editing and alternative orders, supporting records, evidence, activity, technical details, and role/saved-case controls are available through expandable sections. The project explainer separates the business problem and implemented capabilities from its optional architecture details.
+
+[GitHub Actions run 37213190685](https://github.com/josephhaenel/opsdesk/actions/runs/37213190685) passed Python/frontend formatting checks, the production frontend build, and all **28 API/PostgreSQL tests in 2.42 seconds**, with the existing TestClient warning. No live model was called; the guided UI uses the same reference-mode API and template drafts.
+
+The public walkthrough edited AD-1042's case summary. Unsaved changes disabled approval; saving produced revision 2, collapsed the editor, returned focus to the review heading, and left the approval checkbox unchecked. Approving that revision created `SIM-7AC62A2A95484292`; refresh restored the same case and revision. AD-1043 opened the missing-contact editor with approval disabled. Adding a fictional callback address and saving revision 2 made the approval checkbox available.
+
+The custom order menu was checked with ArrowDown, Home, End, Enter, Escape, and outside-click dismissal. Employee access showed six ordinary orders; manager access showed eight, with the disputed order described as requiring manager review. At 1280 × 800, the preparation button was fully visible (bottom 781.6 pixels). Public 320- and 390-pixel layouts had no horizontal overflow, including the space reserved for the native scrollbar. Phone users still scroll through the introduction and scenario choices.
+
+Follow-up commit `94a83d3251d5a6f90c3989181da15fbfd233356b` restores the pending approval's workflow before an older selection and clears its recovery key only when that same workflow completes. Policy dialogs explicitly return focus to their opening control. [GitHub Actions run 37213933267](https://github.com/josephhaenel/opsdesk/actions/runs/37213933267) passed formatting, the frontend production build, and all **28 API/PostgreSQL tests in 1.99 seconds**, with the existing TestClient warning. The legacy cross-tab pending-selection edge was reviewed in source; it was not reproduced through browser storage injection.
+
+The deployed follow-up serves the expected frontend asset. Reopening a saved case retained revision 2, and Escape from the policy dialog returned focus to the source button. Only web was recreated; API/database containers and the shared proxy were preserved. OpsDesk health and all five other shared sites returned HTTP 200.
+
+These are recruiter-perspective visual and functional checks, not a study with recruiters or a full accessibility audit. Template mode and the absence of live AI calls remain visible on the initial and review screens.
+
 ## Evaluation and remaining verification
 
 `eval/reference-scenarios.jsonl` contains **eight distinct scenario inputs**, all explicitly marked `scenario_only_not_model_evaluated`. They cover missing delivery, incomplete contact, restricted accounts, manager escalation, authority-changing prompt attempts, unknown facts, source instructions, and draft-only customer responses. Their structure and unique IDs were checked; no model answers or semantic scores were measured.

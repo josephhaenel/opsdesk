@@ -12,7 +12,9 @@ docker compose --env-file C:\private\opsdesk.env up --build -d
 
 Open `http://localhost:4329`. The API applies migration 1 before serving; later runs preserve the existing synthetic cases. PostgreSQL and the API have no host-published ports. The web port is bound to loopback.
 
-Choose the employee demo identity. Investigate AD-1042, open evidence, edit the draft or summary, save a revision, and approve it to create a simulated case. AD-1043 demonstrates a missing callback. The manager identity opens AD-2041 and its escalation evidence. These are intentionally selectable demo identities, not verified staff accounts. Each visitor's workflow and case records are isolated.
+Choose **Missing delivery** and select **Prepare a support case**. Review the suggested reply and case, open supporting evidence as needed, then confirm the saved version and select **Create demo case**. Editing the reply or case details creates a new revision when saved; save before approving. **Missing contact details** demonstrates AD-1043's required callback.
+
+Expand **Explore permissions & saved cases** to switch to the manager identity or reopen saved work. To investigate AD-2041 and its escalation evidence, choose Manager, then expand **Edit report or choose another order** and select that order. These are intentionally selectable demo identities, not verified staff accounts. Each visitor's workflow and case records are isolated.
 
 ## Develop and test
 
@@ -20,7 +22,7 @@ Use Python 3.12 and Node 22. Install `apps/api/requirements-dev.txt` in a virtua
 
 From the repository root, run `python -m ruff format apps/api/opsdesk` to format Python and `python -m ruff check apps/api/opsdesk` to check unused imports and variables. In `apps/web`, run `npm run format` to format the frontend or `npm run format:check` to check it. CI checks both formatters before the existing API tests and production build. Editor settings and formatter versions are checked in so future edits keep the same style.
 
-Frontend session state, requests, and recovery stay in `App.tsx`. `WorkspaceSidebar`, `WorkspaceHeader`, and `ReportComposer` render those values and call their supplied callbacks. `WorkspacePanels` handles order details, evidence, activity, and revision review. On the backend, `main.py` defines HTTP routes, `authorization.py` checks access, `retrieval.py` selects policies, and `workflows.py` manages revisions and transactional case creation.
+Frontend session state, requests, and recovery stay in `App.tsx`. `DemoNavigation` renders the demo/project navigation, `ReportComposer` presents the guided scenarios and optional report editing, and `DemoControls` provides role selection, saved cases, and reset. These components render supplied state and call supplied callbacks. `SelectField` is the shared keyboard-accessible custom selection menu. `WorkspacePanels` handles order details, evidence, activity, and revision review. On the backend, `main.py` defines HTTP routes, `authorization.py` checks access, `retrieval.py` selects policies, and `workflows.py` manages revisions and transactional case creation.
 
 ```powershell
 docker compose -f compose.test.yaml up -d
