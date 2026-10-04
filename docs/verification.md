@@ -16,6 +16,8 @@ Before that final run, the initial full suite passed 25 checks in 85.61 seconds.
 
 Each run emitted one Starlette TestClient deprecation warning about its httpx adapter; no test failed because of it. These wall times include HTTP testing and database round trips. They are not public request latency measurements.
 
+[GitHub Actions run 37176587090](https://github.com/josephhaenel/opsdesk/actions/runs/37176587090) verified commit `be5145d06983d3c3cd0fdb6a9b1149985c0eebb1`: both API and frontend jobs passed. The separate CI PostgreSQL/API suite passed all 28 tests in 2.39 seconds, with the same TestClient warning; the frontend installation and production build passed. CI used its disposable PostgreSQL service and no provider credentials. The shorter CI test time reflects a different environment and database connection path, not a public application speed claim.
+
 | Boundary | Observed result |
 | --- | --- |
 | Account scope | An employee cannot read or draft against a manager-only order; missing and unauthorized order lookups return the same response shape. |
