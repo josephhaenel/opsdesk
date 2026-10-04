@@ -764,6 +764,13 @@ textarea {
 select {
   padding-right: 26px;
 }
+select option {
+  background: var(--surface);
+  color: var(--text);
+}
+select option:disabled {
+  color: var(--dim);
+}
 .form-hint {
   color: var(--muted);
   display: flex;
