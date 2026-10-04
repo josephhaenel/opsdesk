@@ -2,6 +2,7 @@
 
 Run before starting the API: python -m opsdesk.migrate
 """
+
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
@@ -21,7 +22,9 @@ def migrate(database_url=None):
             with Session(bind=connection) as db:
                 versions = list(db.query(SchemaVersion.version).all())
                 if any(version[0] > 1 for version in versions):
-                    raise RuntimeError("Database schema is newer than this API deployment.")
+                    raise RuntimeError(
+                        "Database schema is newer than this API deployment."
+                    )
                 if not versions:
                     seed_corpus(db)
                     db.flush()

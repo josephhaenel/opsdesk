@@ -39,7 +39,9 @@ class Order(Base):
     customer_name: Mapped[str] = mapped_column(String(120))
     delivery_status: Mapped[str] = mapped_column(String(32))
     expected_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
-    delivered_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    delivered_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
     proof_of_delivery: Mapped[str | None] = mapped_column(String(400), nullable=True)
     items: Mapped[list] = mapped_column(JSONB)
     contact_name: Mapped[str] = mapped_column(String(120))
@@ -49,6 +51,7 @@ class Order(Base):
 
 class Policy(Base):
     """Activation row; approval locks this row before comparing source versions."""
+
     __tablename__ = "policies"
     code: Mapped[str] = mapped_column(String(40), primary_key=True)
     active_version: Mapped[int] = mapped_column(Integer)
@@ -72,7 +75,9 @@ class PolicyVersion(Base):
 class Workflow(Base):
     __tablename__ = "workflows"
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
-    session_id: Mapped[str] = mapped_column(ForeignKey("demo_sessions.id", ondelete="CASCADE"), index=True)
+    session_id: Mapped[str] = mapped_column(
+        ForeignKey("demo_sessions.id", ondelete="CASCADE"), index=True
+    )
     order_id: Mapped[str] = mapped_column(ForeignKey("orders.id"))
     message: Mapped[str] = mapped_column(Text)
     state: Mapped[str] = mapped_column(String(32))
@@ -86,7 +91,9 @@ class Revision(Base):
     __tablename__ = "revisions"
     __table_args__ = (UniqueConstraint("workflow_id", "number"),)
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
-    workflow_id: Mapped[str] = mapped_column(ForeignKey("workflows.id", ondelete="CASCADE"), index=True)
+    workflow_id: Mapped[str] = mapped_column(
+        ForeignKey("workflows.id", ondelete="CASCADE"), index=True
+    )
     number: Mapped[int] = mapped_column(Integer)
     response: Mapped[str] = mapped_column(Text)
     summary: Mapped[str] = mapped_column(Text)
@@ -105,8 +112,12 @@ class Revision(Base):
 class Approval(Base):
     __tablename__ = "approvals"
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
-    workflow_id: Mapped[str] = mapped_column(ForeignKey("workflows.id", ondelete="CASCADE"))
-    revision_id: Mapped[str] = mapped_column(ForeignKey("revisions.id", ondelete="CASCADE"), unique=True)
+    workflow_id: Mapped[str] = mapped_column(
+        ForeignKey("workflows.id", ondelete="CASCADE")
+    )
+    revision_id: Mapped[str] = mapped_column(
+        ForeignKey("revisions.id", ondelete="CASCADE"), unique=True
+    )
     actor_role: Mapped[str] = mapped_column(String(16))
     payload_digest: Mapped[str] = mapped_column(String(64))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
@@ -116,9 +127,15 @@ class Approval(Base):
 class SupportCase(Base):
     __tablename__ = "support_cases"
     id: Mapped[str] = mapped_column(String(40), primary_key=True)
-    session_id: Mapped[str] = mapped_column(ForeignKey("demo_sessions.id", ondelete="CASCADE"), index=True)
-    workflow_id: Mapped[str] = mapped_column(ForeignKey("workflows.id", ondelete="CASCADE"), unique=True)
-    revision_id: Mapped[str] = mapped_column(ForeignKey("revisions.id", ondelete="CASCADE"), unique=True)
+    session_id: Mapped[str] = mapped_column(
+        ForeignKey("demo_sessions.id", ondelete="CASCADE"), index=True
+    )
+    workflow_id: Mapped[str] = mapped_column(
+        ForeignKey("workflows.id", ondelete="CASCADE"), unique=True
+    )
+    revision_id: Mapped[str] = mapped_column(
+        ForeignKey("revisions.id", ondelete="CASCADE"), unique=True
+    )
     order_id: Mapped[str] = mapped_column(ForeignKey("orders.id"))
     priority: Mapped[str] = mapped_column(String(16))
     summary: Mapped[str] = mapped_column(Text)
@@ -131,11 +148,15 @@ class Operation(Base):
     __tablename__ = "operations"
     __table_args__ = (UniqueConstraint("session_id", "kind", "operation_id"),)
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
-    session_id: Mapped[str] = mapped_column(ForeignKey("demo_sessions.id", ondelete="CASCADE"), index=True)
+    session_id: Mapped[str] = mapped_column(
+        ForeignKey("demo_sessions.id", ondelete="CASCADE"), index=True
+    )
     kind: Mapped[str] = mapped_column(String(24))
     operation_id: Mapped[str] = mapped_column(String(80))
     request_digest: Mapped[str] = mapped_column(String(64))
-    workflow_id: Mapped[str] = mapped_column(ForeignKey("workflows.id", ondelete="CASCADE"))
+    workflow_id: Mapped[str] = mapped_column(
+        ForeignKey("workflows.id", ondelete="CASCADE")
+    )
     result: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
 
@@ -143,7 +164,9 @@ class Operation(Base):
 class Activity(Base):
     __tablename__ = "activity"
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
-    workflow_id: Mapped[str] = mapped_column(ForeignKey("workflows.id", ondelete="CASCADE"), index=True)
+    workflow_id: Mapped[str] = mapped_column(
+        ForeignKey("workflows.id", ondelete="CASCADE"), index=True
+    )
     kind: Mapped[str] = mapped_column(String(40))
     message: Mapped[str] = mapped_column(String(600))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)

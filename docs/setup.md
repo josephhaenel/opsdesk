@@ -16,7 +16,11 @@ Choose the employee demo identity. Investigate AD-1042, open evidence, edit the 
 
 ## Develop and test
 
-Use Python 3.12 and Node 22. Install the pinned Python dependencies in a virtual environment and install the frontend lockfile dependencies with `npm ci` in `apps/web`.
+Use Python 3.12 and Node 22. Install `apps/api/requirements-dev.txt` in a virtual environment and install the frontend lockfile dependencies with `npm ci` in `apps/web`. The API image installs only `requirements.txt`; formatting tools stay in development.
+
+From the repository root, run `python -m ruff format apps/api/opsdesk` to format Python and `python -m ruff check apps/api/opsdesk` to check unused imports and variables. In `apps/web`, run `npm run format` to format the frontend or `npm run format:check` to check it. CI checks both formatters before the existing API tests and production build. Editor settings and formatter versions are checked in so future edits keep the same style.
+
+Frontend session state, requests, and recovery stay in `App.tsx`. `WorkspaceSidebar`, `WorkspaceHeader`, and `ReportComposer` render those values and call their supplied callbacks. `WorkspacePanels` handles order details, evidence, activity, and revision review. On the backend, `main.py` defines HTTP routes, `authorization.py` checks access, `retrieval.py` selects policies, and `workflows.py` manages revisions and transactional case creation.
 
 ```powershell
 docker compose -f compose.test.yaml up -d
