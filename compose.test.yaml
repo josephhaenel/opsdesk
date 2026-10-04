@@ -1,0 +1,14 @@
+name: opsdesk-local-tests
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: opsdesk_test
+      POSTGRES_USER: opsdesk_test
+      POSTGRES_PASSWORD: isolated-local-test-only
+    ports: ["127.0.0.1:54329:5432"]
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U opsdesk_test -d opsdesk_test"]
+      interval: 3s
+      timeout: 3s
+      retries: 12

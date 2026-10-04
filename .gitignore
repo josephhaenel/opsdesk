@@ -1,0 +1,34 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Local dependencies and generated artifacts
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+node_modules/
+dist/
+coverage/
+playwright-report/
+test-results/
+*.tsbuildinfo
+
+# Local release packages and diagnostics
+work/
+*.tar.gz
+
+# Local data and editor files
+data/local/
+*.log
+.DS_Store
+Thumbs.db
+
+# Personal source documents do not belong in this public project
+*Resume*.pdf
+*resume*.pdf

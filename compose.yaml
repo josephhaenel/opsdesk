@@ -1,0 +1,59 @@
+name: opsdesk
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: opsdesk
+      POSTGRES_USER: opsdesk
+      POSTGRES_PASSWORD: ${OPSDESK_DB_PASSWORD:?Set OPSDESK_DB_PASSWORD in a private env file}
+    volumes:
+      - opsdesk-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U opsdesk -d opsdesk"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    restart: unless-stopped
+    mem_limit: 384m
+    networks: [opsdesk]
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+    environment:
+      OPSDESK_DATABASE_URL: postgresql+psycopg://opsdesk:${OPSDESK_DB_PASSWORD}@db:5432/opsdesk
+      OPSDESK_ALLOWED_ORIGINS: ${OPSDESK_ALLOWED_ORIGINS:-http://localhost:4329}
+      OPSDESK_COOKIE_SECURE: ${OPSDESK_COOKIE_SECURE:-false}
+      OPSDESK_TRUST_PROXY_IP: "false"
+    depends_on:
+      db:
+        condition: service_healthy
+    command: [sh, -c, "python -m opsdesk.migrate && uvicorn opsdesk.main:app --host 0.0.0.0 --port 8000 --proxy-headers --forwarded-allow-ips='*'"]
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=3)"]
+      interval: 15s
+      timeout: 5s
+      start_period: 20s
+      retries: 5
+    restart: unless-stopped
+    mem_limit: 384m
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    networks: [opsdesk]
+  web:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile.web
+    ports:
+      - "127.0.0.1:${OPSDESK_PORT:-4329}:8080"
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+    mem_limit: 96m
+    networks: [opsdesk]
+
+volumes:
+  opsdesk-data:
+networks:
+  opsdesk:
