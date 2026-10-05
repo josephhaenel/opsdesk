@@ -60,7 +60,7 @@ export function DemoControls({
         </fieldset>
         <p className="small muted">
           Both roles are selectable for this demo. The server checks which orders, policies, and
-          actions each role can access.
+          actions each role can access. Your demo data expires after 24 hours.
         </p>
         {workflows.length ? (
           <div>

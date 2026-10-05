@@ -1,11 +1,4 @@
-import {
-  ArrowRight,
-  CheckCircle2,
-  ClipboardList,
-  LoaderCircle,
-  Package,
-  UserRound,
-} from 'lucide-react';
+import { ArrowRight, LoaderCircle } from 'lucide-react';
 import { SelectField } from './SelectField';
 import type { Order, PendingCreate } from './types';
 
@@ -29,14 +22,12 @@ const scenarios = [
     title: 'Missing delivery',
     description: 'Review a delivery report, then approve a standard support case.',
     recommended: true,
-    icon: Package,
   },
   {
     id: 'AD-1043',
     title: 'Missing contact details',
     description: 'See why the case is blocked, then add the missing contact information.',
     recommended: false,
-    icon: UserRound,
   },
 ];
 
@@ -64,7 +55,6 @@ export function ReportComposer({
     <section className="panel report-composer" aria-labelledby="composer-title">
       <div className="section-heading">
         <h2 id="composer-title">Choose a scenario</h2>
-        <ClipboardList size={18} className="muted" />
       </div>
       <form
         onSubmit={(event) => {
@@ -75,44 +65,49 @@ export function ReportComposer({
         {availableScenarios.length ? (
           <div className="scenario-options" role="group" aria-label="Demo scenarios">
             {availableScenarios.map((scenario) => {
-              const Icon = scenario.icon;
               const selected = activeScenario === scenario.id;
               return (
                 <button
                   key={scenario.id}
                   type="button"
-                  className={`scenario-card${selected ? ' is-selected' : ''}`}
+                  className={`scenario-tab${selected ? ' is-selected' : ''}`}
                   aria-pressed={selected}
                   aria-describedby={`scenario-${scenario.id}-description`}
                   disabled={locked}
                   onClick={() => (onScenarioChange ?? onOrderChange)(scenario.id)}
                 >
-                  <span className="scenario-icon">
-                    <Icon size={20} aria-hidden="true" />
+                  <span>{scenario.title}</span>
+                  <span className="sr-only" id={`scenario-${scenario.id}-description`}>
+                    {scenario.description}{' '}
+                    {scenario.recommended ? 'Recommended starting point.' : ''}
                   </span>
-                  <span className="scenario-card-content">
-                    <strong>{scenario.title}</strong>
-                    <span
-                      className="scenario-description"
-                      id={`scenario-${scenario.id}-description`}
-                    >
-                      {scenario.description}
-                    </span>
-                    {scenario.recommended ? (
-                      <span className="scenario-tag">Recommended</span>
-                    ) : null}
-                  </span>
-                  {selected ? (
-                    <CheckCircle2 size={18} className="scenario-check" aria-hidden="true" />
-                  ) : null}
                 </button>
               );
             })}
           </div>
         ) : null}
         <div className="selected-order-context">
-          <strong>{selectedOrder?.customer_name ?? 'Selected order'}</strong>
-          <span>{orderId}</span>
+          <div className="order-identity">
+            <span className="order-label">Order</span>
+            <div className="order-identity-value">
+              <strong>{selectedOrder?.customer_name ?? 'Selected order'}</strong>
+              <span>{orderId}</span>
+            </div>
+          </div>
+          <div className="order-status">
+            <span className="order-label">Delivery status</span>
+            <span className={`delivery-status ${selectedOrder?.delivery_status ?? ''}`}>
+              {selectedOrder?.delivery_status === 'delivered'
+                ? 'Delivered'
+                : selectedOrder?.delivery_status === 'disputed'
+                  ? 'Disputed'
+                  : selectedOrder?.delivery_status === 'in_transit'
+                    ? 'In transit'
+                    : selectedOrder?.delivery_status === 'missing'
+                      ? 'Missing'
+                      : 'Not recorded'}
+            </span>
+          </div>
         </div>
         <div className="report-preview">
           <span className="report-preview-label">Customer report</span>
@@ -168,11 +163,7 @@ export function ReportComposer({
           type="submit"
           disabled={isWorking || !orderId || !message.trim()}
         >
-          {busy === 'create' ? (
-            <LoaderCircle size={17} className="spinner" />
-          ) : (
-            <ClipboardList size={17} />
-          )}
+          {busy === 'create' ? <LoaderCircle size={17} className="spinner" /> : null}
           {busy === 'create'
             ? 'Preparing case…'
             : pendingCreate

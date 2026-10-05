@@ -1,6 +1,6 @@
-# OpsDesk
+# Casework
 
-OpsDesk is a delivery-support portfolio application for Alder Distribution, a fictional distributor. An employee investigates a synthetic missing delivery, inspects authorized policies, edits a saved proposal, and approves that exact revision to create a simulated support case.
+Casework is a delivery-support portfolio application for Alder Distribution, a fictional distributor. An employee investigates a synthetic missing delivery, inspects authorized policies, edits a saved proposal, and approves that exact revision to create a simulated support case.
 
 **First increment: reference mode.** Drafts use deterministic templates. PostgreSQL persistence, policy retrieval, permissions, approval, case creation, and recovery are implemented. No live model is called, no customer response is sent, and no external ticket is created. This is not the complete AI MVP or a production-readiness claim.
 
@@ -20,7 +20,7 @@ Choose **Missing contact details** for AD-1043 to see why approval is blocked un
 
 Under **Explore permissions & saved cases**, the manager identity can access AD-2041, escalation policies, and urgent priority. There are eight synthetic orders across three fictional customers and six versioned policies. Role identities are intentionally selectable; they demonstrate backend authorization rather than authenticating real employees. Mutable records are isolated per visitor and expire after 24 hours.
 
-![OpsDesk guided demo](docs/images/opsdesk.jpg)
+![Casework guided demo](docs/images/casework.png)
 
 ## What is implemented
 
@@ -77,3 +77,9 @@ The project draws on applied distribution/enterprise AI experience using entirel
 4. Publish model/version, methodology, measured failures, and reproducible results; then produce a walkthrough video and expand the personal-website project entry into a case study.
 
 The public repository and hosted reference workflow are useful early evidence. Applications can proceed while the remaining AI and learning increments are developed.
+
+## Casework visual refresh
+
+The public-facing product is now Casework: a light, two-column introduction and delivery-report workspace, with a typographic wordmark and restrained blue actions. The existing OpsDesk URL, repository, database and session keys stay stable. The review flow, exact-revision approval and durable case recovery remain unchanged.
+
+[Design comparison and responsive checks](design-qa.md) document the selected direction and verification. Wordmark, favicon and font-license provenance are in [asset notes](docs/design/README.md).

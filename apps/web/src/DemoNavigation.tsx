@@ -8,16 +8,11 @@ interface DemoNavigationProps {
 export function DemoNavigation({ tab, onTabChange }: DemoNavigationProps) {
   return (
     <header className="demo-navigation">
-      <a className="demo-brand" href="/" aria-label="OpsDesk home">
-        <span className="brand-mark" aria-hidden="true">
-          <span />
-          <span />
-          <span />
-          <span />
+      <a className="demo-brand" href="/" aria-label="Casework home">
+        <span className="wordmark-frame">
+          <img src="/casework-wordmark.png" alt="Casework" width="1881" height="836" />
         </span>
-        <span>
-          OpsDesk<small>By Joseph Haenel</small>
-        </span>
+        <small>By Joseph Haenel</small>
       </a>
       <nav className="demo-nav-links" aria-label="Demo navigation">
         <button

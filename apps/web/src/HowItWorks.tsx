@@ -80,7 +80,7 @@ export function HowItWorks({ onExplore }: { onExplore: () => void }) {
     <div className="how-it-works">
       <div className="page-heading">
         <div>
-          <h1>About OpsDesk</h1>
+          <h1>About Casework</h1>
           <p>A delivery-support portfolio project by Joseph Haenel.</p>
         </div>
         <button className="button primary" onClick={onExplore}>
@@ -91,7 +91,7 @@ export function HowItWorks({ onExplore }: { onExplore: () => void }) {
         <h2 id="project-problem">From a missing delivery to a reviewed support case.</h2>
         <p>
           A support employee needs to check the order, find the right policy, and collect complete
-          contact details before opening a case. OpsDesk brings those steps into one workspace and
+          contact details before opening a case. Casework brings those steps into one workspace and
           keeps a person responsible for the final decision.
         </p>
         <p>

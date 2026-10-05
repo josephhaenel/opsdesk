@@ -362,13 +362,13 @@ export default function App() {
   const navigationLocked = isWorking || pendingApproval !== null || pendingCreate !== null;
 
   return (
-    <div className="app-shell guided-demo">
+    <div className="app guided-demo">
       <a className="skip-link" href="#main-content">
         Skip to main content
       </a>
       <DemoNavigation tab={tab} onTabChange={setTab} />
       <div className="main-shell">
-        <main id="main-content" tabIndex={-1}>
+        <main id="main-content" className="main-content" tabIndex={-1}>
           {pendingApproval && !unresolvedApproval && !loading ? (
             <div className="error-banner" role="status">
               <div>
@@ -444,28 +444,59 @@ export default function App() {
           ) : tab === 'guide' ? (
             <HowItWorks onExplore={() => setTab('workspace')} />
           ) : (
-            <>
-              <div className="demo-intro">
+            <div className={`casework-layout ${workflow ? 'is-reviewing' : 'is-starting'}`}>
+              <section className="demo-intro">
                 <div>
-                  <span className="demo-kicker">Interactive AI engineering portfolio</span>
+                  <span className="demo-kicker">AI engineering portfolio</span>
                   <h1 ref={headingRef} tabIndex={-1}>
-                    {workflow
-                      ? workflow.state === 'completed'
-                        ? 'A delivery report, handled with review.'
-                        : 'Review the reply and proposed case.'
-                      : 'From a missing delivery to a reviewed support case.'}
+                    {workflow ? (
+                      workflow.state === 'completed' ? (
+                        'A delivery report, handled with review.'
+                      ) : (
+                        'Review the reply and proposed case.'
+                      )
+                    ) : (
+                      <>
+                        {'Good support'}
+                        <br />
+                        starts with the facts.
+                      </>
+                    )}
                   </h1>
                   <p className="demo-description">
                     {workflow
                       ? workflow.state === 'completed'
                         ? 'Your case is saved. Refresh the page to see the same result.'
                         : 'Check the draft below. You decide whether to create the case.'
-                      : 'OpsDesk checks order facts, finds relevant policies, and prepares a support case for a person to approve. Try the workflow in about two minutes.'}
-                  </p>
-                  <p className="demo-meta">
-                    Fictional orders · Template drafts, no live AI call · No messages sent
+                      : 'Review a delivery report, inspect its policies, and approve a support case.'}
                   </p>
                 </div>
+                <ol className="demo-steps" aria-label="Demo progress">
+                  {['Choose', 'Review', 'Create'].map((label, index) => {
+                    const step = workflow?.state === 'completed' ? 2 : workflow ? 1 : 0;
+                    return (
+                      <li
+                        key={label}
+                        className={index === step ? 'current' : index < step ? 'done' : ''}
+                        aria-current={index === step ? 'step' : undefined}
+                      >
+                        <span>{index < step ? <CheckCircle2 size={16} /> : index + 1}</span>
+                        <strong>{label}</strong>
+                      </li>
+                    );
+                  })}
+                </ol>
+                {!workflow ? (
+                  <p className="project-summary">
+                    Casework checks order facts, finds relevant policies, and prepares a support
+                    case for a person to approve. Try the workflow in about two minutes.
+                  </p>
+                ) : null}
+                <p className="demo-meta">
+                  Template drafts · Fictional records · No messages sent
+                  <br />
+                  Live AI drafting is not enabled.
+                </p>
                 {workflow ? (
                   <button
                     className="button secondary compact"
@@ -476,138 +507,127 @@ export default function App() {
                     <Plus size={16} /> Try another scenario
                   </button>
                 ) : null}
-              </div>
-              <ol className="demo-steps" aria-label="Demo progress">
-                {['Choose a scenario', 'Review the draft', 'Create a demo case'].map(
-                  (label, index) => {
-                    const step = workflow?.state === 'completed' ? 2 : workflow ? 1 : 0;
-                    return (
-                      <li
-                        key={label}
-                        className={index === step ? 'current' : index < step ? 'done' : ''}
-                        aria-current={index === step ? 'step' : undefined}
-                      >
-                        <span>{index < step ? <CheckCircle2 size={16} /> : index + 1}</span>
-                        {label}
-                      </li>
-                    );
-                  },
-                )}
-              </ol>
-              {workflow?.case ? (
-                <section className="case-result" aria-label="Demo case created">
-                  <span className="result-icon">
-                    <CheckCircle2 size={23} />
-                  </span>
-                  <div>
-                    <span className="demo-kicker">Step 3 complete</span>
-                    <h2>Demo case created</h2>
-                    <p>{workflow.case.summary}</p>
-                    <p className="small">
-                      Case <code>{workflow.case.id}</code> · Saved from revision{' '}
-                      {workflow.revision.number}
-                    </p>
-                    <p className="small muted">
-                      A refresh or retry recovers this case instead of creating a duplicate. The
-                      reply remains a draft.
-                    </p>
-                  </div>
-                </section>
-              ) : null}
-              <div className={`guided-content${workflow ? '' : ' is-starting'}`}>
-                {workflow ? (
-                  <ReviewPanel
-                    workflow={workflow}
-                    fields={fields}
-                    role={session.role}
-                    changed={changed}
-                    confirmed={confirmed}
-                    busy={busy}
-                    unresolvedApproval={unresolvedApproval}
-                    onChange={(next) => {
-                      setFields(next);
-                      setConfirmed(false);
-                    }}
-                    onConfirm={setConfirmed}
-                    onSave={() => void saveRevision()}
-                    onApprove={() => void approve()}
-                  />
-                ) : (
-                  <ReportComposer
-                    orders={orders}
-                    orderId={orderId}
-                    message={message}
-                    pendingCreate={pendingCreate}
-                    busy={busy}
-                    isWorking={isWorking || pendingApproval !== null}
-                    onOrderChange={(id) => {
-                      setOrderId(id);
-                      setMessage(defaultMessage(id));
-                    }}
-                    onMessageChange={setMessage}
-                    onPrepare={() => void prepare()}
-                  />
-                )}
-                {workflow ? (
-                  <aside className="demo-support" aria-label="Evidence and case history">
-                    <section className="checks-summary">
-                      <h2>Why this draft?</h2>
-                      <p>
-                        Prepared from the order record and {workflow.evidence.length} available
-                        policies. You can inspect both before approving.
+              </section>
+              <div className="casework-workspace">
+                {workflow?.case ? (
+                  <section className="case-result" aria-label="Demo case created">
+                    <span className="result-icon">
+                      <CheckCircle2 size={23} />
+                    </span>
+                    <div>
+                      <span className="demo-kicker">Step 3 complete</span>
+                      <h2>Demo case created</h2>
+                      <p>{workflow.case.summary}</p>
+                      <p className="small">
+                        Case <code>{workflow.case.id}</code> · Saved from revision{' '}
+                        {workflow.revision.number}
                       </p>
-                    </section>
-                    <details className="context-disclosure">
-                      <summary>
-                        Read the supporting policies <span>{workflow.evidence.length}</span>
-                      </summary>
-                      <div className="context-disclosure-body">
-                        <EvidencePanel
-                          workflow={workflow}
-                          onOpen={(source) => void openEvidence(source)}
-                        />
-                      </div>
-                    </details>
-                    <details className="context-disclosure">
-                      <summary>Customer report &amp; order facts</summary>
-                      <div className="context-disclosure-body">
-                        <blockquote className="report-preview">{workflow.message}</blockquote>
-                        {selectedOrder ? <OrderDetails order={selectedOrder} /> : null}
-                      </div>
-                    </details>
-                    <details className="context-disclosure">
-                      <summary>Activity &amp; technical details</summary>
-                      <div className="context-disclosure-body">
-                        <ActivityPanel workflow={workflow} />
-                      </div>
-                    </details>
-                  </aside>
+                      <p className="small muted">
+                        A refresh or retry recovers this case instead of creating a duplicate. The
+                        reply remains a draft.
+                      </p>
+                    </div>
+                  </section>
                 ) : null}
+                <div className={`guided-content${workflow ? '' : ' is-starting'}`}>
+                  {workflow ? (
+                    <ReviewPanel
+                      workflow={workflow}
+                      fields={fields}
+                      role={session.role}
+                      changed={changed}
+                      confirmed={confirmed}
+                      busy={busy}
+                      unresolvedApproval={unresolvedApproval}
+                      onChange={(next) => {
+                        setFields(next);
+                        setConfirmed(false);
+                      }}
+                      onConfirm={setConfirmed}
+                      onSave={() => void saveRevision()}
+                      onApprove={() => void approve()}
+                    />
+                  ) : (
+                    <ReportComposer
+                      orders={orders}
+                      orderId={orderId}
+                      message={message}
+                      pendingCreate={pendingCreate}
+                      busy={busy}
+                      isWorking={isWorking || pendingApproval !== null}
+                      onOrderChange={(id) => {
+                        setOrderId(id);
+                        setMessage(defaultMessage(id));
+                      }}
+                      onMessageChange={setMessage}
+                      onPrepare={() => void prepare()}
+                    />
+                  )}
+                  {workflow ? (
+                    <aside className="demo-support" aria-label="Evidence and case history">
+                      <section className="checks-summary">
+                        <h2>Why this draft?</h2>
+                        <p>
+                          Prepared from the order record and {workflow.evidence.length} available{' '}
+                          {workflow.evidence.length === 1 ? 'policy' : 'policies'}. You can inspect
+                          both before approving.
+                        </p>
+                      </section>
+                      <details className="context-disclosure">
+                        <summary>
+                          Read the supporting policies <span>{workflow.evidence.length}</span>
+                        </summary>
+                        <div className="context-disclosure-body">
+                          <EvidencePanel
+                            workflow={workflow}
+                            onOpen={(source) => void openEvidence(source)}
+                          />
+                        </div>
+                      </details>
+                      <details className="context-disclosure">
+                        <summary>Customer report &amp; order facts</summary>
+                        <div className="context-disclosure-body">
+                          <blockquote className="report-preview">{workflow.message}</blockquote>
+                          {selectedOrder ? <OrderDetails order={selectedOrder} /> : null}
+                        </div>
+                      </details>
+                      <details className="context-disclosure">
+                        <summary>Activity &amp; technical details</summary>
+                        <div className="context-disclosure-body">
+                          <ActivityPanel workflow={workflow} />
+                        </div>
+                      </details>
+                    </aside>
+                  ) : null}
+                </div>
               </div>
-              <DemoControls
-                role={session.role}
-                workflows={workflows}
-                currentWorkflowId={workflow?.id}
-                isWorking={isWorking}
-                navigationLocked={navigationLocked}
-                busy={busy}
-                resetPrompt={resetPrompt}
-                onRoleChange={(role) => void changeRole(role)}
-                onOpenWorkflow={(id) => {
-                  setTab('workspace');
-                  void loadWorkflow(id);
-                }}
-                onResetPromptChange={setResetPrompt}
-                onResetSandbox={() => void resetSandbox()}
-              />
-            </>
+            </div>
           )}
         </main>
         <footer className="main-footer">
           <a href="https://josephhaenel.com" target="_blank" rel="noreferrer">
-            Joseph Haenel · Portfolio
+            AI-assisted portfolio project
           </a>
-          <span>Built with AI assistance · Demo data expires after 24 hours</span>
+          {session && tab === 'workspace' ? (
+            <DemoControls
+              role={session.role}
+              workflows={workflows}
+              currentWorkflowId={workflow?.id}
+              isWorking={isWorking}
+              navigationLocked={navigationLocked}
+              busy={busy}
+              resetPrompt={resetPrompt}
+              onRoleChange={(role) => void changeRole(role)}
+              onOpenWorkflow={(id) => {
+                setTab('workspace');
+                void loadWorkflow(id);
+              }}
+              onResetPromptChange={setResetPrompt}
+              onResetSandbox={() => void resetSandbox()}
+            />
+          ) : (
+            <span>Demo data expires after 24 hours</span>
+          )}
         </footer>
       </div>
       {evidenceOpen ? (
