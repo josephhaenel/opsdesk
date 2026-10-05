@@ -93,3 +93,21 @@ These are recruiter-perspective visual and functional checks, not a study with r
 `eval/reference-scenarios.jsonl` contains **eight distinct scenario inputs**, all explicitly marked `scenario_only_not_model_evaluated`. They cover missing delivery, incomplete contact, restricted accounts, manager escalation, authority-changing prompt attempts, unknown facts, source instructions, and draft-only customer responses. Their structure and unique IDs were checked; no model answers or semantic scores were measured.
 
 This report does not establish live-provider answer quality, semantic grounding, token/cost accuracy, worker recovery, real staff authentication, external ticket-system integration, comprehensive browser coverage, every TLS/proxy configuration detail, load capacity, or outage recovery. The current increment uses deterministic reference drafts and simulated support cases; no model calls have been made. Both demo roles are intentionally selectable inside each visitor's synthetic sandbox. The local browser and public deployment observations above are measured checks; the unevaluated scenarios and future model/worker capabilities remain planned work.
+
+## Casework rebrand verification
+
+Recorded October 4, 2026 (America/Chicago). Source commit `61d4c17bc86ef6fff85976fe7ebbe49df43f0579` implements the selected Casework visual direction, including generated wordmark/favicon, self-hosted fonts, light surfaces and blue controls. [Design QA](../design-qa.md) records the side-by-side reference comparison and responsive checks. The existing public URL and browser-storage keys remain stable.
+
+[CI run 37255106769](https://github.com/josephhaenel/opsdesk/actions/runs/37255106769) passed frontend formatting/build, API formatting/lint, and **28 API/PostgreSQL tests in 2.77 seconds**, with the existing TestClient warning.
+
+The real HTTPS walkthrough prepared AD-1042, edited its summary, observed approval disabled while unsaved, saved revision 2, then explicitly reviewed and approved it. It created `SIM-722DB6F77BDC4739`; refresh restored that same case and revision. [Completed case screenshot](images/casework-completed.png).
+
+AD-1043 automatically opened the missing-contact editor with approval disabled. Adding the fictional `maya@harbor.example` callback and saving revision 2 made review available. Checking the saved-revision confirmation enabled creation. No second case was created for that verification.
+
+The supporting-policy dialog loaded the authorized source. Escape closed it and returned focus to the opening source control. Employee/manager switching worked and cleared the review confirmation. The published order menu supported ArrowDown/Enter selection and Escape dismissal with focus returned to the combobox. Public 320- and 768-pixel layouts had no horizontal overflow (`scrollWidth === clientWidth`); local 390-pixel and 320-pixel review/About layouts were also inspected. No browser JavaScript errors were captured in the tested live flow.
+
+Only the demo web container and the portfolio web container were rebuilt/recreated. API `1f67cc1d64d1`, database `c04b0a7f5c30`, their persistent volume and the shared proxy were preserved. The first activation rolled back after a public static-file check returned 403: a restrictive archive-extraction mask had made copied files unreadable by Nginx. Public-source permissions were corrected, file readability was checked as the Nginx worker before activation, and the final deployment passed health, HTML, logo, favicon, font and built-asset checks.
+
+The portfolio entry now displays Casework and links the same live demo/source, preserving its existing anchor and themes. Its automatic deployment still fails because its existing SSH credential is rejected ([run 37255109374](https://github.com/josephhaenel/personal_website/actions/runs/37255109374)); publication used the working local SSH connection and a scoped, backed-up web deployment. OpsDesk health returned PostgreSQL/reference mode. Demo, portfolio, banking, Caldera, Cadence and SnowPro public endpoints all returned HTTP 200 after publication.
+
+These checks establish the tested visual and synthetic support workflow, not live-model quality, a full accessibility audit or performance capacity. Drafting remains deterministic templates, with no live model call or messages sent.

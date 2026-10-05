@@ -1,6 +1,6 @@
 # Casework design QA
 
-Reference: [Selected option 1](docs/design/casework-reference.png). Implementation: [desktop screenshot](docs/images/casework.png). Both initial screens were compared together at 1487 × 1058 in a side-by-side browser comparison, rather than relying on separate visual recall.
+Reference: [Selected option 1](docs/design/casework-reference.png). Implementation: [local desktop screenshot](docs/design/casework-local-desktop.png). Both initial screens were compared together at 1487 × 1058 in a side-by-side browser comparison, rather than relying on separate visual recall.
 
 ## Scope and findings
 
@@ -13,7 +13,7 @@ Reference: [Selected option 1](docs/design/casework-reference.png). Implementati
 - Accessibility: semantic headings, input labels, 44-pixel minimum controls, visible keyboard focus, native dialog semantics and reduced-motion rules retained. Removed the programmatically focused headline's distracting default outline without changing control focus indicators.
 - Copy: Casework name is consistent across visible navigation, page title and About copy. Fictional data, template drafting, no customer sending and disabled live AI remain explicit.
 
-Local visual fixtures are read-only and are not evidence of backend mutation correctness. Production workflow verification is recorded separately after deployment.
+Local visual fixtures are read-only and are not evidence of backend mutation correctness. The published application uses the existing PostgreSQL API. The real prepare/edit/save/approve/refresh path and missing-contact blocker passed; see the Casework section of [verification notes](docs/verification.md). Public 320- and 768-pixel layouts and keyboard menu selection were also checked. The live screenshot in the README is separate from the 1487-pixel local comparison.
 
 No open P0, P1 or P2 design findings.
 
